@@ -6,15 +6,22 @@ function valueOf(id) {
 function calc() {
   let total = 0;
 
-  const a4copy = valueOf("a4copy");
+  // A4 photocopy uses: muka surat × set = total muka surat.
+  const a4pages = valueOf("a4pages");
+  const a4sets = valueOf("a4sets");
+  const a4copy = a4pages * a4sets;
+
   const a3copy = valueOf("a3copy");
+  const iccopy = valueOf("iccopy");
   const a4bw = valueOf("a4bw");
   const a410 = valueOf("a410");
   const a450 = valueOf("a450");
   const a4100 = valueOf("a4100");
   const a3bw = valueOf("a3bw");
 
-  // Photocopy A4
+  document.getElementById("a4copyTotal").textContent = `${a4copy} ms`;
+
+  // Photocopy A4 - pricing is based on the final total muka surat.
   if (a4copy <= 5) total += a4copy * 0.20;
   else if (a4copy <= 10) total += (5 * 0.20) + ((a4copy - 5) * 0.10);
   else total += (5 * 0.20) + (5 * 0.10) + ((a4copy - 10) * 0.05);
@@ -22,6 +29,9 @@ function calc() {
   // Photocopy A3
   if (a3copy <= 10) total += a3copy * 0.50;
   else total += (10 * 0.50) + ((a3copy - 10) * 0.30);
+
+  // Photocopy IC - flat RM0.20 per piece.
+  total += iccopy * 0.20;
 
   // Printing A4 Black & White
   if (a4bw <= 10) total += a4bw * 0.50;
@@ -55,7 +65,7 @@ function resetCalc() {
     input.value = 0;
   });
   calc();
-  document.getElementById("a4copy").focus();
+  document.getElementById("a4pages").focus();
 }
 
 calc();

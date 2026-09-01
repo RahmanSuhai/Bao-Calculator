@@ -107,7 +107,7 @@ input,
 }
 
 .photocopy-card .field-group + .field-group{
-  margin-top:clamp(18px,2.2vh,28px);
+  margin-top:clamp(14px,1.7vh,22px);
 }
 
 .printing-fields{
@@ -129,6 +129,78 @@ label{
   margin:0 0 6px;
   font-size:clamp(13px,1vw,16px);
   font-weight:800;
+}
+
+
+.multiply-inputs{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  gap:10px;
+  align-items:end;
+}
+
+.mini-field{
+  min-width:0;
+}
+
+.mini-label{
+  display:block;
+  margin:0 0 5px;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:700;
+}
+
+.multiply-sign{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:clamp(44px,5.4vh,58px);
+  color:var(--purple);
+  font-family:Arial,Helvetica,sans-serif;
+  font-size:24px;
+  font-weight:700;
+}
+
+.quantity-result{
+  margin-top:8px;
+  padding:7px 10px;
+  border-radius:10px;
+  background:rgba(37,117,252,.08);
+  color:var(--muted);
+  font-size:11px;
+  font-weight:600;
+}
+
+.quantity-result strong{
+  color:var(--blue);
+  font-family:Arial,Helvetica,sans-serif;
+  font-size:13px;
+}
+
+.label-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:6px;
+}
+
+.label-row label{
+  margin:0;
+}
+
+.rate-badge{
+  display:inline-flex;
+  align-items:center;
+  min-height:24px;
+  padding:3px 8px;
+  border-radius:999px;
+  background:rgba(106,17,203,.09);
+  color:var(--purple);
+  font-size:10px;
+  font-weight:800;
+  white-space:nowrap;
 }
 
 input{
@@ -242,7 +314,12 @@ button:active{transform:translateY(0);}
   .printing-fields{gap:6px;}
   label{margin-bottom:4px;font-size:13px;}
   input{height:42px;font-size:15px;}
-  .photocopy-card .field-group + .field-group{margin-top:16px;}
+  .photocopy-card .field-group + .field-group{margin-top:10px;}
+  .multiply-inputs{gap:7px;}
+  .mini-label{font-size:10px;margin-bottom:3px;}
+  .quantity-result{margin-top:5px;padding:5px 8px;font-size:10px;}
+  .multiply-sign{height:42px;font-size:20px;}
+  .rate-badge{font-size:9px;min-height:21px;padding:2px 7px;}
   .price{margin-top:18px;}
   #total{font-size:50px;}
   .currency{font-size:22px;margin-top:7px;}
@@ -265,4 +342,6 @@ button:active{transform:translateY(0);}
   .summary-panel{grid-column:auto;grid-template-columns:1fr;}
   .card,.summary-panel{border-radius:20px;}
   #total{font-size:52px;}
+  .multiply-inputs{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);}
 }
+
