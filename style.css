@@ -12,7 +12,6 @@
 }
 
 *{box-sizing:border-box;}
-
 html,body{margin:0;min-height:100%;}
 
 body{
@@ -23,12 +22,13 @@ body{
   overflow:hidden;
 }
 
-/* Default: all text follows Poppins */
 button,input{font:inherit;}
 
-/* Digits only areas: input values + total amount use Arial */
+/* Input digits + calculated digits use Arial. */
 input,
-#total{
+#total,
+.row-total,
+#a4copyGrandTotal{
   font-family:Arial,Helvetica,sans-serif;
 }
 
@@ -67,7 +67,7 @@ input,
 .calculator-grid{
   min-height:0;
   display:grid;
-  grid-template-columns:minmax(260px,.85fr) minmax(410px,1.35fr) minmax(260px,.72fr);
+  grid-template-columns:minmax(300px,.95fr) minmax(410px,1.35fr) minmax(260px,.72fr);
   gap:clamp(14px,1.5vw,24px);
   align-items:stretch;
 }
@@ -83,21 +83,13 @@ input,
   padding:clamp(18px,2vw,28px);
   display:flex;
   flex-direction:column;
+  min-height:0;
 }
 
 .card-heading{
   padding-bottom:clamp(12px,1.5vh,18px);
   border-bottom:1px solid #e8e9f0;
   margin-bottom:clamp(12px,1.5vh,18px);
-}
-
-.eyebrow{
-  display:block;
-  margin-bottom:5px;
-  color:var(--blue);
-  font-size:11px;
-  font-weight:800;
-  letter-spacing:1.5px;
 }
 
 .card h2{
@@ -107,7 +99,7 @@ input,
 }
 
 .photocopy-card .field-group + .field-group{
-  margin-top:clamp(14px,1.7vh,22px);
+  margin-top:clamp(12px,1.5vh,20px);
 }
 
 .printing-fields{
@@ -131,78 +123,6 @@ label{
   font-weight:800;
 }
 
-
-.multiply-inputs{
-  display:grid;
-  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
-  gap:10px;
-  align-items:end;
-}
-
-.mini-field{
-  min-width:0;
-}
-
-.mini-label{
-  display:block;
-  margin:0 0 5px;
-  color:var(--muted);
-  font-size:11px;
-  font-weight:700;
-}
-
-.multiply-sign{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  height:clamp(44px,5.4vh,58px);
-  color:var(--purple);
-  font-family:Arial,Helvetica,sans-serif;
-  font-size:24px;
-  font-weight:700;
-}
-
-.quantity-result{
-  margin-top:8px;
-  padding:7px 10px;
-  border-radius:10px;
-  background:rgba(37,117,252,.08);
-  color:var(--muted);
-  font-size:11px;
-  font-weight:600;
-}
-
-.quantity-result strong{
-  color:var(--blue);
-  font-family:Arial,Helvetica,sans-serif;
-  font-size:13px;
-}
-
-.label-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:6px;
-}
-
-.label-row label{
-  margin:0;
-}
-
-.rate-badge{
-  display:inline-flex;
-  align-items:center;
-  min-height:24px;
-  padding:3px 8px;
-  border-radius:999px;
-  background:rgba(106,17,203,.09);
-  color:var(--purple);
-  font-size:10px;
-  font-weight:800;
-  white-space:nowrap;
-}
-
 input{
   width:100%;
   height:clamp(44px,5.4vh,58px);
@@ -219,6 +139,166 @@ input{
 input:focus{
   border-color:var(--blue);
   box-shadow:0 0 0 4px rgba(37,117,252,.13);
+}
+
+/* Dynamic A4 photocopy rows */
+.a4-title-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:8px;
+}
+
+.a4-title-row label{margin:0;}
+
+.add-row-btn{
+  flex:0 0 auto;
+  width:34px;
+  height:34px;
+  min-height:34px;
+  padding:0;
+  border:0;
+  border-radius:10px;
+  background:linear-gradient(135deg,var(--purple),#7a08db);
+  color:#fff;
+  font-family:Arial,Helvetica,sans-serif;
+  font-size:25px;
+  font-weight:700;
+  line-height:1;
+  cursor:pointer;
+  box-shadow:0 7px 15px rgba(106,17,203,.20);
+  transition:transform .15s ease,filter .15s ease;
+}
+
+.add-row-btn:hover{filter:brightness(1.06);transform:translateY(-1px);}
+.add-row-btn:active{transform:translateY(0);}
+
+.a4-column-headings{
+  display:grid;
+  grid-template-columns:minmax(72px,1fr) 18px minmax(62px,.8fr) 18px minmax(66px,.8fr) 26px;
+  gap:5px;
+  align-items:end;
+  margin:0 0 4px;
+  padding:0 2px;
+  color:var(--muted);
+  font-size:10px;
+  font-weight:700;
+}
+
+.a4-copy-rows{
+  max-height:clamp(120px,24vh,220px);
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:2px 5px 2px 1px;
+  scrollbar-width:thin;
+}
+
+.a4-copy-row{
+  display:grid;
+  grid-template-columns:minmax(72px,1fr) 18px minmax(62px,.8fr) 18px minmax(66px,.8fr) 26px;
+  gap:5px;
+  align-items:center;
+  margin-bottom:7px;
+}
+
+.a4-copy-row:last-child{margin-bottom:0;}
+
+.a4-copy-row input{
+  min-width:0;
+  height:42px;
+  padding:0 10px;
+  border-radius:10px;
+  font-size:16px;
+}
+
+.math-sign{
+  text-align:center;
+  color:var(--purple);
+  font-family:Arial,Helvetica,sans-serif;
+  font-size:18px;
+  font-weight:700;
+}
+
+.row-total{
+  display:flex;
+  align-items:center;
+  min-width:0;
+  height:42px;
+  padding:0 8px;
+  border-radius:10px;
+  background:rgba(37,117,252,.08);
+  color:var(--blue);
+  font-size:14px;
+  font-weight:700;
+  white-space:nowrap;
+}
+
+.remove-row-btn{
+  width:26px;
+  height:26px;
+  min-height:26px;
+  padding:0;
+  border:0;
+  border-radius:8px;
+  background:rgba(21,24,39,.08);
+  color:var(--muted);
+  font-family:Arial,Helvetica,sans-serif;
+  font-size:17px;
+  font-weight:700;
+  line-height:1;
+  cursor:pointer;
+  box-shadow:none;
+}
+
+.remove-row-btn:hover{
+  background:rgba(106,17,203,.11);
+  color:var(--purple);
+}
+
+.remove-row-btn.is-first{
+  visibility:hidden;
+  pointer-events:none;
+}
+
+.a4-grand-total{
+  display:flex;
+  justify-content:flex-end;
+  gap:5px;
+  margin-top:8px;
+  padding-top:8px;
+  border-top:1px solid #e8e9f0;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:700;
+}
+
+.a4-grand-total strong{
+  color:var(--blue);
+  font-size:13px;
+}
+
+.label-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:6px;
+}
+
+.label-row label{margin:0;}
+
+.rate-badge{
+  display:inline-flex;
+  align-items:center;
+  min-height:24px;
+  padding:3px 8px;
+  border-radius:999px;
+  background:rgba(106,17,203,.09);
+  color:var(--purple);
+  font-size:10px;
+  font-weight:800;
+  white-space:nowrap;
 }
 
 .summary-panel{
@@ -264,7 +344,6 @@ input:focus{
   overflow-wrap:anywhere;
 }
 
-/* RM stays Poppins */
 .currency{
   margin-top:9px;
   font-family:'Poppins',Arial,Helvetica,sans-serif;
@@ -283,7 +362,7 @@ input:focus{
   line-height:1.45;
 }
 
-button{
+.reset-btn{
   position:relative;
   z-index:1;
   width:100%;
@@ -300,10 +379,10 @@ button{
   transition:transform .15s ease,filter .15s ease;
 }
 
-button:hover{filter:brightness(1.05);transform:translateY(-1px);}
-button:active{transform:translateY(0);}
+.reset-btn:hover{filter:brightness(1.05);transform:translateY(-1px);}
+.reset-btn:active{transform:translateY(0);}
 
-/* Compact laptop height: keep everything within one desktop screen. */
+/* Compact laptop height: keep the page within one desktop screen. */
 @media (min-width:901px) and (max-height:760px){
   .app-shell{padding:16px 22px;gap:12px;}
   .app-header h1{font-size:28px;}
@@ -314,17 +393,23 @@ button:active{transform:translateY(0);}
   .printing-fields{gap:6px;}
   label{margin-bottom:4px;font-size:13px;}
   input{height:42px;font-size:15px;}
-  .photocopy-card .field-group + .field-group{margin-top:10px;}
-  .multiply-inputs{gap:7px;}
-  .mini-label{font-size:10px;margin-bottom:3px;}
-  .quantity-result{margin-top:5px;padding:5px 8px;font-size:10px;}
-  .multiply-sign{height:42px;font-size:20px;}
+  .photocopy-card .field-group + .field-group{margin-top:9px;}
+  .a4-title-row{margin-bottom:5px;}
+  .add-row-btn{width:30px;height:30px;min-height:30px;font-size:21px;}
+  .a4-column-headings{font-size:9px;margin-bottom:2px;}
+  .a4-copy-rows{max-height:145px;}
+  .a4-copy-row{margin-bottom:5px;}
+  .a4-copy-row input,.row-total{height:36px;}
+  .a4-copy-row input{font-size:14px;}
+  .row-total{font-size:12px;padding:0 6px;}
+  .a4-grand-total{margin-top:5px;padding-top:5px;font-size:10px;}
+  .a4-grand-total strong{font-size:12px;}
   .rate-badge{font-size:9px;min-height:21px;padding:2px 7px;}
   .price{margin-top:18px;}
   #total{font-size:50px;}
   .currency{font-size:22px;margin-top:7px;}
   .summary-note{margin-top:16px;font-size:12px;}
-  button{min-height:54px;font-size:20px;}
+  .reset-btn{min-height:54px;font-size:20px;}
 }
 
 /* Tablet and phone: preserve readability instead of squeezing three columns too tightly. */
@@ -335,6 +420,7 @@ button:active{transform:translateY(0);}
   .summary-panel{grid-column:1 / -1;display:grid;grid-template-columns:1fr minmax(160px,220px);align-items:center;}
   .summary-note{display:none;}
   .price{margin-top:12px;}
+  .a4-copy-rows{max-height:260px;}
 }
 
 @media (max-width:620px){
@@ -342,6 +428,10 @@ button:active{transform:translateY(0);}
   .summary-panel{grid-column:auto;grid-template-columns:1fr;}
   .card,.summary-panel{border-radius:20px;}
   #total{font-size:52px;}
-  .multiply-inputs{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);}
+  .a4-column-headings,
+  .a4-copy-row{
+    grid-template-columns:minmax(64px,1fr) 16px minmax(58px,.8fr) 16px minmax(62px,.8fr) 24px;
+    gap:4px;
+  }
+  .a4-copy-row input{padding:0 8px;}
 }
-

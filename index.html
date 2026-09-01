@@ -18,33 +18,43 @@
     <section class="calculator-grid">
       <article class="card photocopy-card">
         <div class="card-heading">
-          <span class="eyebrow">SERVICE 01</span>
           <h2>Photocopy</h2>
         </div>
 
         <div class="field-group a4-copy-group">
-          <label>A4 Quantity</label>
-          <div class="multiply-inputs">
-            <div class="mini-field">
-              <span class="mini-label">Muka Surat</span>
-              <input id="a4pages" type="number" min="0" step="1" value="0" inputmode="numeric" aria-label="A4 muka surat" oninput="calc()">
-            </div>
+          <div class="a4-title-row">
+            <label>A4 Quantity</label>
+            <button class="add-row-btn" type="button" onclick="addA4Row()" aria-label="Tambah baris A4">+</button>
+          </div>
 
-            <span class="multiply-sign" aria-hidden="true">×</span>
+          <div class="a4-column-headings" aria-hidden="true">
+            <span>Muka Surat</span>
+            <span></span>
+            <span>Set</span>
+            <span></span>
+            <span>Jumlah</span>
+            <span></span>
+          </div>
 
-            <div class="mini-field">
-              <span class="mini-label">Set</span>
-              <input id="a4sets" type="number" min="0" step="1" value="0" inputmode="numeric" aria-label="A4 bilangan set" oninput="calc()">
+          <div id="a4Rows" class="a4-copy-rows">
+            <div class="a4-copy-row">
+              <input class="a4-pages" type="number" min="0" step="1" value="0" inputmode="numeric" aria-label="A4 muka surat">
+              <span class="math-sign" aria-hidden="true">×</span>
+              <input class="a4-sets" type="number" min="1" step="1" value="1" inputmode="numeric" aria-label="A4 bilangan set">
+              <span class="math-sign" aria-hidden="true">=</span>
+              <output class="row-total">0 ms</output>
+              <button class="remove-row-btn is-first" type="button" onclick="removeA4Row(this)" aria-label="Buang baris A4">×</button>
             </div>
           </div>
-          <div class="quantity-result">
-            Total muka surat: <strong id="a4copyTotal">0 ms</strong>
+
+          <div class="a4-grand-total">
+            Jumlah A4: <strong id="a4copyGrandTotal">0 ms</strong>
           </div>
         </div>
 
         <div class="field-group">
           <label for="a3copy">A3 Quantity</label>
-          <input id="a3copy" type="number" min="0" step="1" value="0" inputmode="numeric" oninput="calc()">
+          <input id="a3copy" type="number" min="0" step="1" value="0" inputmode="numeric">
         </div>
 
         <div class="field-group ic-group">
@@ -52,40 +62,39 @@
             <label for="iccopy">IC</label>
             <span class="rate-badge">RM 0.20 / keping</span>
           </div>
-          <input id="iccopy" type="number" min="0" step="1" value="0" inputmode="numeric" aria-label="IC quantity" oninput="calc()">
+          <input id="iccopy" type="number" min="0" step="1" value="0" inputmode="numeric" aria-label="IC quantity">
         </div>
       </article>
 
       <article class="card printing-card">
         <div class="card-heading">
-          <span class="eyebrow">SERVICE 02</span>
           <h2>Printing</h2>
         </div>
 
         <div class="printing-fields">
           <div class="field-group">
             <label for="a4bw">A4 Black &amp; White</label>
-            <input id="a4bw" type="number" min="0" step="1" value="0" inputmode="numeric" oninput="calc()">
+            <input id="a4bw" type="number" min="0" step="1" value="0" inputmode="numeric">
           </div>
 
           <div class="field-group">
             <label for="a410">A4 Colour 10%</label>
-            <input id="a410" type="number" min="0" step="1" value="0" inputmode="numeric" oninput="calc()">
+            <input id="a410" type="number" min="0" step="1" value="0" inputmode="numeric">
           </div>
 
           <div class="field-group">
             <label for="a450">A4 Colour 50%</label>
-            <input id="a450" type="number" min="0" step="1" value="0" inputmode="numeric" oninput="calc()">
+            <input id="a450" type="number" min="0" step="1" value="0" inputmode="numeric">
           </div>
 
           <div class="field-group">
             <label for="a4100">A4 Colour 100%</label>
-            <input id="a4100" type="number" min="0" step="1" value="0" inputmode="numeric" oninput="calc()">
+            <input id="a4100" type="number" min="0" step="1" value="0" inputmode="numeric">
           </div>
 
           <div class="field-group">
             <label for="a3bw">A3 Black &amp; White</label>
-            <input id="a3bw" type="number" min="0" step="1" value="0" inputmode="numeric" oninput="calc()">
+            <input id="a3bw" type="number" min="0" step="1" value="0" inputmode="numeric">
           </div>
         </div>
       </article>
@@ -99,37 +108,105 @@
           </div>
           <p class="summary-note">Amount updates automatically as you enter quantities.</p>
         </div>
-        <button id="resetBtn" type="button" onclick="resetCalc()">Reset</button>
+        <button id="resetBtn" class="reset-btn" type="button" onclick="resetCalc()">Reset</button>
       </aside>
     </section>
   </main>
 
   <script>
+    function positiveNumber(value, fallback = 0) {
+      const number = Number(value);
+      return Number.isFinite(number) && number >= 0 ? number : fallback;
+    }
+
     function qty(id) {
       const el = document.getElementById(id);
-      if (!el) return 0;
-      const value = Number(el.value);
-      return Number.isFinite(value) && value > 0 ? value : 0;
+      return el ? positiveNumber(el.value, 0) : 0;
+    }
+
+    function createA4Row() {
+      const row = document.createElement('div');
+      row.className = 'a4-copy-row';
+      row.innerHTML = `
+        <input class="a4-pages" type="number" min="0" step="1" value="0" inputmode="numeric" aria-label="A4 muka surat">
+        <span class="math-sign" aria-hidden="true">×</span>
+        <input class="a4-sets" type="number" min="1" step="1" value="1" inputmode="numeric" aria-label="A4 bilangan set">
+        <span class="math-sign" aria-hidden="true">=</span>
+        <output class="row-total">0 ms</output>
+        <button class="remove-row-btn" type="button" onclick="removeA4Row(this)" aria-label="Buang baris A4">×</button>
+      `;
+      return row;
+    }
+
+    function addA4Row() {
+      const rows = document.getElementById('a4Rows');
+      const row = createA4Row();
+      rows.appendChild(row);
+      refreshRemoveButtons();
+      calc();
+      row.querySelector('.a4-pages').focus();
+      row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+
+    function removeA4Row(button) {
+      const rows = document.getElementById('a4Rows');
+      const allRows = rows.querySelectorAll('.a4-copy-row');
+
+      if (allRows.length === 1) {
+        const row = allRows[0];
+        row.querySelector('.a4-pages').value = 0;
+        row.querySelector('.a4-sets').value = 1;
+      } else {
+        button.closest('.a4-copy-row').remove();
+      }
+
+      refreshRemoveButtons();
+      calc();
+    }
+
+    function refreshRemoveButtons() {
+      const rows = document.querySelectorAll('#a4Rows .a4-copy-row');
+      rows.forEach((row, index) => {
+        const button = row.querySelector('.remove-row-btn');
+        button.classList.toggle('is-first', rows.length === 1 && index === 0);
+      });
+    }
+
+    function getA4CopyTotal() {
+      let totalPages = 0;
+
+      document.querySelectorAll('#a4Rows .a4-copy-row').forEach((row) => {
+        const pagesInput = row.querySelector('.a4-pages');
+        const setsInput = row.querySelector('.a4-sets');
+        const rowTotalEl = row.querySelector('.row-total');
+
+        const pages = positiveNumber(pagesInput.value, 0);
+        let sets = Number(setsInput.value);
+        if (!Number.isFinite(sets) || sets < 1) sets = 1;
+
+        const rowTotal = pages * sets;
+        rowTotalEl.textContent = rowTotal + ' ms';
+        totalPages += rowTotal;
+      });
+
+      const grandTotalEl = document.getElementById('a4copyGrandTotal');
+      if (grandTotalEl) grandTotalEl.textContent = totalPages + ' ms';
+
+      return totalPages;
     }
 
     function calc() {
       let total = 0;
 
-      // A4 Photocopy: muka surat × set
-      const a4pages = qty("a4pages");
-      const a4sets = qty("a4sets");
-      const a4copy = a4pages * a4sets;
-
-      const a3copy = qty("a3copy");
-      const iccopy = qty("iccopy");
-      const a4bw = qty("a4bw");
-      const a410 = qty("a410");
-      const a450 = qty("a450");
-      const a4100 = qty("a4100");
-      const a3bw = qty("a3bw");
-
-      const totalPagesEl = document.getElementById("a4copyTotal");
-      if (totalPagesEl) totalPagesEl.textContent = a4copy + " ms";
+      // A4 photocopy = sum of every Muka Surat × Set row.
+      const a4copy = getA4CopyTotal();
+      const a3copy = qty('a3copy');
+      const iccopy = qty('iccopy');
+      const a4bw = qty('a4bw');
+      const a410 = qty('a410');
+      const a450 = qty('a450');
+      const a4100 = qty('a4100');
+      const a3bw = qty('a3bw');
 
       // Photocopy A4
       if (a4copy <= 5) total += a4copy * 0.20;
@@ -163,25 +240,35 @@
       if (a3bw <= 10) total += a3bw * 1.00;
       else total += (10 * 1.00) + ((a3bw - 10) * 0.50);
 
-      const totalEl = document.getElementById("total");
-      if (totalEl) totalEl.textContent = total.toFixed(2);
+      document.getElementById('total').textContent = total.toFixed(2);
     }
 
     function resetCalc() {
-      document.querySelectorAll('input[type="number"]').forEach((input) => {
+      const rows = document.getElementById('a4Rows');
+      rows.innerHTML = '';
+      rows.appendChild(createA4Row());
+
+      document.querySelectorAll('input[type="number"]:not(.a4-pages):not(.a4-sets)').forEach((input) => {
         input.value = 0;
       });
+
+      refreshRemoveButtons();
       calc();
-      const first = document.getElementById("a4pages");
+
+      const first = document.querySelector('.a4-pages');
       if (first) first.focus();
     }
 
-    // Extra fallback listeners for browsers/devices.
-    document.querySelectorAll('input[type="number"]').forEach((input) => {
-      input.addEventListener("input", calc);
-      input.addEventListener("change", calc);
+    // Event delegation keeps calculation working for rows added later.
+    document.addEventListener('input', (event) => {
+      if (event.target.matches('input[type="number"]')) calc();
     });
 
+    document.addEventListener('change', (event) => {
+      if (event.target.matches('input[type="number"]')) calc();
+    });
+
+    refreshRemoveButtons();
     calc();
   </script>
 </body>
